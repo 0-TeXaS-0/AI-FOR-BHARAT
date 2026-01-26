@@ -1,36 +1,163 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multilingual Mandi - 48 Hour Hackathon MVP
 
-## Getting Started
+A web platform for local vendors providing instant AI-driven price discovery and negotiation tools with English-Hindi translation.
 
-First, run the development server:
+## 🚀 Quick Start
 
+### Prerequisites
+- Node.js 18+ and npm
+- Modern web browser
+- Terminal/Command Prompt
+
+### Installation & Setup
+
+1. **Clone and navigate to project:**
+   ```bash
+   cd multilingual-mandi
+   npm install
+   ```
+
+2. **Set up backend:**
+   ```bash
+   cd backend
+   npm install
+   ```
+
+3. **Start both servers:**
+   ```bash
+   # Terminal 1 - Backend (Port 5000)
+   cd backend
+   npm run dev
+   
+   # Terminal 2 - Frontend (Port 3000)
+   npm run dev
+   ```
+
+4. **Open browser:** http://localhost:3000
+
+## 🎯 MVP Features
+
+1. **Bilingual Product Search** - Search in English/Hindi with auto-translation
+2. **Mock Price Discovery** - Compare prices from multiple vendors
+3. **Translation Chat** - Real-time English↔Hindi chat translation
+4. **Price Negotiation Simulator** - AI-suggested negotiation flow
+
+## 🎬 Demo Flow
+
+1. **Landing Page** → Select "I'm a Buyer"
+2. **Search** → Type "टमाटर" or "tomato"
+3. **Price Comparison** → View vendor prices (₹20-35/kg)
+4. **Vendor Selection** → Click preferred vendor
+5. **Translation Chat** → Send "What's your best price?"
+6. **Negotiation** → Use AI suggestions for counter-offers
+7. **Deal Summary** → Complete transaction
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js 16 + TypeScript + Tailwind CSS
+- **Backend**: Node.js + Express.js
+- **Translation**: Mock API (Google Translate ready)
+- **Data**: In-memory mock data
+- **Styling**: Custom design system with dark mode
+
+## 📝 Mock Data
+
+- **Products**: Tomato (टमाटर), Onion (प्याज), Potato (आलू)
+- **Vendors**: 3-6 local vendors with Hindi names
+- **Prices**: ₹20-40/kg range
+- **Translations**: Pre-defined common phrases
+
+## 🎯 Hackathon Scope
+
+**Built**: Core MVP with 4 features + responsive UI
+**Not Built**: Auth, payments, real vendors, mobile app, voice translation
+
+## 🔧 API Endpoints
+
+### Search Products
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+GET /api/search?query=tomato&lang=en
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Get Vendor Details
+```bash
+GET /api/vendor/1
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Translate Text
+```bash
+POST /api/translate
+{
+  "text": "What is your best price?",
+  "from": "en",
+  "to": "hi"
+}
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Get Negotiation Suggestions
+```bash
+POST /api/negotiate
+{
+  "currentPrice": 30,
+  "productType": "vegetables"
+}
+```
 
-## Learn More
+## 🎨 Design System
 
-To learn more about Next.js, take a look at the following resources:
+- **Primary**: #001f3f (Navy blue)
+- **Secondary**: #FF851B (Orange)
+- **Accent**: #2ECC40 (Green)
+- **Background**: #F5F5F5 (Light gray)
+- **Dark Mode**: Full support with toggle
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📱 Responsive Design
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Mobile**: 320px-768px (Stack layout)
+- **Tablet**: 768px-1024px (2-column grid)
+- **Desktop**: 1024px+ (3-column layout)
 
-## Deploy on Vercel
+## 🧪 Testing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Manual Testing Checklist
+- [ ] Landing page loads with bilingual content
+- [ ] Dark mode toggle works
+- [ ] Search works for "टमाटर" and "tomato"
+- [ ] Vendor cards display with pricing
+- [ ] Chat shows real-time translation
+- [ ] AI negotiation provides suggestions
+- [ ] Mobile layout is responsive
+- [ ] Complete user journey works
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**Port already in use:**
+```bash
+# Kill existing Node processes
+taskkill /f /im node.exe  # Windows
+killall node              # Mac/Linux
+```
+
+**Frontend not loading:**
+- Check if backend is running on port 5000
+- Verify no CORS errors in browser console
+- Try refreshing the page
+
+**Search not working:**
+- Use quick suggestion buttons
+- Check backend console for errors
+- Verify mock data is loaded
+
+## 🎯 Demo Preparation
+
+1. **Test complete flow** before demo
+2. **Have backup phrases** ready
+3. **Check both light/dark modes**
+4. **Test mobile responsiveness**
+5. **Prepare for Q&A** about scalability
+
+Ready for demo! 🎉
+
+Built with ❤️ for India's local markets
