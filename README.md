@@ -1,4 +1,4 @@
-# Multilingual Mandi - 48 Hour Hackathon MVP
+# Multilingual Mandi - 
 
 A web platform for local vendors providing instant AI-driven price discovery and negotiation tools with English-Hindi translation.
 
@@ -149,14 +149,6 @@ killall node              # Mac/Linux
 - Use quick suggestion buttons
 - Check backend console for errors
 - Verify mock data is loaded
-
-## 🎯 Demo Preparation
-
-1. **Test complete flow** before demo
-2. **Have backup phrases** ready
-3. **Check both light/dark modes**
-4. **Test mobile responsiveness**
-5. **Prepare for Q&A** about scalability
 
 Ready for demo! 🎉
 
