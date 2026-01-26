@@ -150,14 +150,6 @@ killall node              # Mac/Linux
 - Check backend console for errors
 - Verify mock data is loaded
 
-## 🎯 Demo Preparation
-
-1. **Test complete flow** before demo
-2. **Have backup phrases** ready
-3. **Check both light/dark modes**
-4. **Test mobile responsiveness**
-5. **Prepare for Q&A** about scalability
-
 Ready for demo! 🎉
 
 Built with ❤️ for India's local markets
