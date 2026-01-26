@@ -1,4 +1,4 @@
-# Multilingual Mandi - 48 Hour Hackathon MVP
+# Multilingual Mandi - 
 
 A web platform for local vendors providing instant AI-driven price discovery and negotiation tools with English-Hindi translation.
 
