@@ -37,6 +37,30 @@ app.use((req, res, next) => {
   next();
 });
 
+// AI Agent Chat History
+let chatHistory = [];
+
+// Vendor products storage (in-memory)
+let vendorProducts = [];
+let vendorRequests = [];
+let orders = [];
+let vendorProfile = {
+  name: 'राम किसान',
+  nameEn: 'Ram Kisan',
+  phone: '+91 98765 43210',
+  location: 'Sector 14 Market',
+  locationHindi: 'सेक्टर 14 मार्केट',
+  operatingHours: '6:00 AM - 8:00 PM',
+  operatingHoursHindi: 'सुबह 6:00 - रात 8:00',
+  paymentMethods: ['Cash', 'UPI', 'Card'],
+  paymentMethodsHindi: ['नकद', 'UPI', 'कार्ड'],
+  specialties: ['Organic Vegetables', 'Farm Fresh'],
+  specialtiesHindi: ['जैविक सब्जियां', 'फार्म फ्रेश'],
+  verified: true,
+  rating: 4.5,
+  totalOrders: 1247
+};
+
 // Enhanced mock data
 const mockProducts = [
   {
@@ -490,6 +514,247 @@ app.post('/api/negotiate', (req, res) => {
   }
 });
 
+// Vendor Product Management Endpoints
+app.get('/api/vendor/products', (req, res) => {
+  try {
+    sendSuccess(res, { products: vendorProducts });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.post('/api/vendor/products', (req, res) => {
+  try {
+    const newProduct = {
+      ...req.body,
+      id: Date.now().toString(),
+      addedAt: new Date().toISOString(),
+      stock: req.body.stock || 100,
+      image: req.body.image || null,
+      sold: 0,
+      revenue: 0
+    };
+    vendorProducts.push(newProduct);
+    
+    // Also add to mockProducts for buyer search
+    const existingProduct = mockProducts.find(p => 
+      p.name === newProduct.name || p.nameHindi === newProduct.nameHindi
+    );
+    
+    if (existingProduct) {
+      existingProduct.vendors.push({
+        id: Math.floor(Math.random() * 10000),
+        name: vendorProfile.name,
+        nameEn: vendorProfile.nameEn,
+        price: newProduct.price,
+        location: vendorProfile.location,
+        locationHindi: vendorProfile.locationHindi,
+        rating: vendorProfile.rating,
+        totalReviews: vendorProfile.totalOrders,
+        isOnline: true,
+        responseTime: '< 5 minutes',
+        specialties: vendorProfile.specialties,
+        specialtiesHindi: vendorProfile.specialtiesHindi,
+        verified: vendorProfile.verified
+      });
+    } else {
+      mockProducts.push({
+        id: newProduct.id,
+        name: newProduct.name,
+        nameHindi: newProduct.nameHindi,
+        category: newProduct.category || 'Other',
+        categoryHindi: newProduct.categoryHindi || 'अन्य',
+        unit: newProduct.unit,
+        unitHindi: newProduct.unit === 'kg' ? 'किलो' : newProduct.unit === 'piece' ? 'पीस' : 'दर्जन',
+        vendors: [{
+          id: Math.floor(Math.random() * 10000),
+          name: vendorProfile.name,
+          nameEn: vendorProfile.nameEn,
+          price: newProduct.price,
+          location: vendorProfile.location,
+          locationHindi: vendorProfile.locationHindi,
+          rating: vendorProfile.rating,
+          totalReviews: vendorProfile.totalOrders,
+          isOnline: true,
+          responseTime: '< 5 minutes',
+          specialties: vendorProfile.specialties,
+          specialtiesHindi: vendorProfile.specialtiesHindi,
+          verified: vendorProfile.verified
+        }]
+      });
+    }
+    
+    sendSuccess(res, { product: newProduct }, 'Product added successfully');
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.put('/api/vendor/products/:id', (req, res) => {
+  try {
+    const productIndex = vendorProducts.findIndex(p => p.id === req.params.id);
+    if (productIndex === -1) {
+      return sendError(res, 'Product not found', 404);
+    }
+    vendorProducts[productIndex] = { ...vendorProducts[productIndex], ...req.body };
+    
+    // Update in mockProducts too
+    for (const product of mockProducts) {
+      const vendorIndex = product.vendors.findIndex(v => 
+        v.nameEn === vendorProfile.nameEn && product.name === vendorProducts[productIndex].name
+      );
+      if (vendorIndex !== -1) {
+        product.vendors[vendorIndex].price = vendorProducts[productIndex].price;
+      }
+    }
+    
+    sendSuccess(res, { product: vendorProducts[productIndex] }, 'Product updated');
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.delete('/api/vendor/products/:id', (req, res) => {
+  try {
+    vendorProducts = vendorProducts.filter(p => p.id !== req.params.id);
+    sendSuccess(res, {}, 'Product deleted');
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+// Vendor Requests Management
+app.get('/api/vendor/requests', (req, res) => {
+  try {
+    sendSuccess(res, { requests: vendorRequests });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.post('/api/vendor/requests/:id/respond', (req, res) => {
+  try {
+    const { action, counterPrice, message } = req.body;
+    const requestIndex = vendorRequests.findIndex(r => r.id === req.params.id);
+    
+    if (requestIndex === -1) {
+      return sendError(res, 'Request not found', 404);
+    }
+    
+    vendorRequests[requestIndex].status = action; // 'accepted', 'declined', 'countered'
+    vendorRequests[requestIndex].counterPrice = counterPrice;
+    vendorRequests[requestIndex].vendorMessage = message;
+    vendorRequests[requestIndex].respondedAt = new Date().toISOString();
+    
+    // Update product sold count and revenue if accepted
+    if (action === 'accepted') {
+      const product = vendorProducts.find(p => p.name === vendorRequests[requestIndex].product);
+      if (product) {
+        product.sold += vendorRequests[requestIndex].quantity;
+        product.revenue += (counterPrice || vendorRequests[requestIndex].offerPrice) * vendorRequests[requestIndex].quantity;
+        product.stock -= vendorRequests[requestIndex].quantity;
+      }
+    }
+    
+    sendSuccess(res, { request: vendorRequests[requestIndex] }, `Request ${action}`);
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+// Vendor Profile
+app.get('/api/vendor/profile', (req, res) => {
+  try {
+    sendSuccess(res, { profile: vendorProfile });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.put('/api/vendor/profile', (req, res) => {
+  try {
+    vendorProfile = { ...vendorProfile, ...req.body };
+    sendSuccess(res, { profile: vendorProfile }, 'Profile updated');
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+// Analytics
+app.get('/api/vendor/analytics', (req, res) => {
+  try {
+    const totalProducts = vendorProducts.length;
+    const totalRevenue = vendorProducts.reduce((sum, p) => sum + (p.revenue || 0), 0);
+    const totalSold = vendorProducts.reduce((sum, p) => sum + (p.sold || 0), 0);
+    const activeRequests = vendorRequests.filter(r => !r.status || r.status === 'pending').length;
+    const acceptedRequests = vendorRequests.filter(r => r.status === 'accepted').length;
+    
+    const bestSelling = [...vendorProducts]
+      .sort((a, b) => (b.sold || 0) - (a.sold || 0))
+      .slice(0, 3);
+    
+    sendSuccess(res, {
+      totalProducts,
+      totalRevenue,
+      totalSold,
+      activeRequests,
+      acceptedRequests,
+      bestSelling,
+      acceptanceRate: vendorRequests.length > 0 ? ((acceptedRequests / vendorRequests.length) * 100).toFixed(1) : 0
+    });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+// Order Management Endpoints
+app.get('/api/orders', (req, res) => {
+  try {
+    sendSuccess(res, { orders });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.post('/api/orders', (req, res) => {
+  try {
+    const newOrder = {
+      ...req.body,
+      id: req.body.id || Date.now().toString(),
+      orderDate: req.body.orderDate || new Date().toISOString(),
+      status: req.body.status || 'pending',
+    };
+    orders.push(newOrder);
+    
+    // Update vendor analytics
+    const product = vendorProducts.find(p => 
+      p.name === newOrder.productName || p.nameHindi === newOrder.productNameHindi
+    );
+    if (product) {
+      product.sold = (product.sold || 0) + newOrder.quantity;
+      product.revenue = (product.revenue || 0) + newOrder.totalAmount;
+      product.stock = Math.max(0, (product.stock || 100) - newOrder.quantity);
+    }
+    
+    sendSuccess(res, { order: newOrder }, 'Order placed successfully');
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.put('/api/orders/:id', (req, res) => {
+  try {
+    const orderIndex = orders.findIndex(o => o.id === req.params.id);
+    if (orderIndex === -1) {
+      return sendError(res, 'Order not found', 404);
+    }
+    orders[orderIndex] = { ...orders[orderIndex], ...req.body };
+    sendSuccess(res, { order: orders[orderIndex] }, 'Order updated');
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
 app.get('/api/health', (req, res) => {
   const uptime = process.uptime();
   
@@ -513,18 +778,226 @@ app.use((req, res) => {
         'GET /api/search',
         'GET /api/vendor/:id',
         'POST /api/translate',
-        'POST /api/negotiate'
+        'POST /api/negotiate',
+        'GET /api/vendor/products',
+        'POST /api/vendor/products',
+        'PUT /api/vendor/products/:id',
+        'DELETE /api/vendor/products/:id',
+        'GET /api/vendor/requests',
+        'POST /api/vendor/requests/:id/respond',
+        'GET /api/vendor/profile',
+        'PUT /api/vendor/profile',
+        'GET /api/vendor/analytics',
+        'GET /api/orders',
+        'POST /api/orders',
+        'PUT /api/orders/:id'
       ]
     }
   });
 });
 
 // Start server
+// ============================================
+// MULTILINGUAL AI AGENT ENDPOINTS
+// ============================================
+
+// Speech to Text endpoint
+app.post('/api/speech-to-text', async (req, res) => {
+  try {
+    const { audioData, language = 'en' } = req.body;
+
+    if (!audioData) {
+      return res.status(400).json({
+        success: false,
+        error: 'Audio data is required'
+      });
+    }
+
+    // Simulate speech recognition (in production, use Google Speech-to-Text, Azure Speech, etc.)
+    const mockTranscriptions = {
+      en: [
+        'What is your best price for tomatoes?',
+        'Can you reduce the price?',
+        'I will take 2 kg',
+        'What payment methods do you accept?',
+        'When can you deliver?'
+      ],
+      hi: [
+        'टमाटर की आपकी सबसे अच्छी कीमत क्या है?',
+        'क्या आप कीमत कम कर सकते हैं?',
+        'मुझे 2 किलो चाहिए',
+        'आप कौन से भुगतान विधियां स्वीकार करते हैं?',
+        'आप कब डिलीवर कर सकते हैं?'
+      ]
+    };
+
+    const transcriptions = mockTranscriptions[language] || mockTranscriptions.en;
+    const text = transcriptions[Math.floor(Math.random() * transcriptions.length)];
+
+    res.json({
+      success: true,
+      data: {
+        text,
+        language,
+        confidence: 0.85 + Math.random() * 0.14, // 0.85-0.99
+        processingTime: Math.floor(Math.random() * 300) + 100 // 100-400ms
+      }
+    });
+  } catch (error) {
+    console.error('Speech-to-text error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to process speech'
+    });
+  }
+});
+
+// AI Agent Chat endpoint
+app.post('/api/ai-chat', async (req, res) => {
+  try {
+    const { message, language = 'en', context = {} } = req.body;
+
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        error: 'Message is required'
+      });
+    }
+
+    // Store chat in history
+    chatHistory.push({
+      timestamp: new Date(),
+      userMessage: message,
+      language,
+      context
+    });
+
+    // Multilingual AI responses based on message content
+    const generateAIResponse = (msg, lang) => {
+      const msgLower = msg.toLowerCase();
+      
+      const responses = {
+        en: {
+          greeting: 'Hello! I\'m your AI assistant. How can I help you with your shopping today?',
+          price: 'I can help you find the best prices. The current market price for this item is competitive. Would you like me to negotiate for you?',
+          negotiation: 'Based on market analysis, I suggest offering ₹{suggestedPrice}. This gives you a good deal while being fair to the vendor.',
+          quality: 'This vendor has a 4.5-star rating with over 100 verified reviews. They specialize in fresh, organic produce.',
+          delivery: 'Delivery is available within 2-4 hours in your area. The vendor typically responds within 5 minutes.',
+          payment: 'This vendor accepts Cash on Delivery, UPI, and Card payments for your convenience.',
+          quantity: 'I recommend ordering in bulk to get better prices. Would you like to see quantity discounts?',
+          default: 'I understand your question. Let me provide you with the best assistance. Could you please specify what you\'re looking for?'
+        },
+        hi: {
+          greeting: 'नमस्ते! मैं आपका AI सहायक हूं। आज मैं आपकी खरीदारी में कैसे मदद कर सकता हूं?',
+          price: 'मैं आपको सबसे अच्छी कीमतें खोजने में मदद कर सकता हूं। इस वस्तु की वर्तमान बाजार कीमत प्रतिस्पर्धी है। क्या आप चाहते हैं कि मैं आपके लिए बातचीत करूं?',
+          negotiation: 'बाजार विश्लेषण के आधार पर, मैं ₹{suggestedPrice} की पेशकश का सुझाव देता हूं। यह आपको अच्छा सौदा देता है और विक्रेता के लिए भी उचित है।',
+          quality: 'इस विक्रेता की रेटिंग 4.5-स्टार है और 100 से अधिक सत्यापित समीक्षाएं हैं। वे ताज़ा, जैविक उत्पादों में विशेषज्ञ हैं।',
+          delivery: 'आपके क्षेत्र में 2-4 घंटे के भीतर डिलीवरी उपलब्ध है। विक्रेता आमतौर पर 5 मिनट के भीतर जवाब देता है।',
+          payment: 'यह विक्रेता आपकी सुविधा के लिए कैश ऑन डिलीवरी, UPI, और कार्ड भुगतान स्वीकार करता है।',
+          quantity: 'मैं बेहतर कीमतों के लिए थोक में ऑर्डर करने की सलाह देता हूं। क्या आप मात्रा छूट देखना चाहेंगे?',
+          default: 'मैं आपका प्रश्न समझता हूं। मुझे आपको सबसे अच्छी सहायता प्रदान करने दें। कृपया बताएं कि आप क्या ढूंढ रहे हैं?'
+        }
+      };
+
+      const langResponses = responses[lang] || responses.en;
+
+      if (msgLower.includes('hello') || msgLower.includes('hi') || msgLower.includes('नमस्ते')) {
+        return langResponses.greeting;
+      } else if (msgLower.includes('price') || msgLower.includes('cost') || msgLower.includes('कीमत')) {
+        return langResponses.price;
+      } else if (msgLower.includes('negotiate') || msgLower.includes('reduce') || msgLower.includes('कम')) {
+        const suggestedPrice = context.currentPrice ? Math.round(context.currentPrice * 0.93) : 23;
+        return langResponses.negotiation.replace('{suggestedPrice}', suggestedPrice);
+      } else if (msgLower.includes('quality') || msgLower.includes('review') || msgLower.includes('गुणवत्ता')) {
+        return langResponses.quality;
+      } else if (msgLower.includes('deliver') || msgLower.includes('shipping') || msgLower.includes('डिलीवरी')) {
+        return langResponses.delivery;
+      } else if (msgLower.includes('payment') || msgLower.includes('pay') || msgLower.includes('भुगतान')) {
+        return langResponses.payment;
+      } else if (msgLower.includes('quantity') || msgLower.includes('bulk') || msgLower.includes('मात्रा')) {
+        return langResponses.quantity;
+      } else {
+        return langResponses.default;
+      }
+    };
+
+    const aiResponse = generateAIResponse(message, language);
+
+    // Update chat history
+    chatHistory[chatHistory.length - 1].aiResponse = aiResponse;
+
+    res.json({
+      success: true,
+      data: {
+        response: aiResponse,
+        language,
+        confidence: 0.92,
+        suggestions: language === 'en' 
+          ? [
+              'Tell me about quality',
+              'What are payment options?',
+              'How fast is delivery?'
+            ]
+          : [
+              'मुझे गुणवत्ता के बारे में बताएं',
+              'भुगतान विकल्प क्या हैं?',
+              'डिलीवरी कितनी तेज़ है?'
+            ],
+        timestamp: new Date()
+      }
+    });
+  } catch (error) {
+    console.error('AI chat error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to process AI chat'
+    });
+  }
+});
+
+// Get AI chat history
+app.get('/api/ai-chat/history', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: {
+        history: chatHistory.slice(-50), // Last 50 messages
+        totalMessages: chatHistory.length
+      }
+    });
+  } catch (error) {
+    console.error('Get chat history error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get chat history'
+    });
+  }
+});
+
+// Clear AI chat history
+app.delete('/api/ai-chat/history', (req, res) => {
+  try {
+    chatHistory = [];
+    res.json({
+      success: true,
+      message: 'Chat history cleared'
+    });
+  } catch (error) {
+    console.error('Clear chat history error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to clear chat history'
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Multilingual Mandi API Server`);
   console.log(`📍 Running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`⏰ Started at: ${new Date().toISOString()}`);
+  console.log(`🤖 AI Chat: POST http://localhost:${PORT}/api/ai-chat`);
+  console.log(`🎤 Speech-to-Text: POST http://localhost:${PORT}/api/speech-to-text`);
   console.log(`✅ Server ready for connections`);
 });
 

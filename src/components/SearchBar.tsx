@@ -79,10 +79,10 @@ export default function SearchBar({
   };
 
   return (
-    <div className="sticky top-16 bg-white dark:bg-gray-900 shadow-md p-4 z-40 border-b border-gray-200 dark:border-gray-700">
+    <div className="sticky top-16 bg-white dark:bg-gray-900 shadow-lg p-5 z-40 border-b-2 border-gray-200 dark:border-gray-700">
       <div className="container mx-auto">
         {/* Main Search Bar */}
-        <div className="relative max-w-2xl mx-auto">
+        <div className="relative max-w-3xl mx-auto">
           <input
             ref={inputRef}
             type="text"
@@ -92,12 +92,12 @@ export default function SearchBar({
             onFocus={() => setShowSuggestions(true)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             placeholder={placeholder}
-            className="w-full pl-12 pr-24 py-4 bg-[#F5F5F5] dark:bg-gray-800 border-2 border-transparent focus:border-[#FF851B] focus:bg-white dark:focus:bg-gray-700 rounded-xl text-lg transition-all duration-200 placeholder-gray-500 dark:placeholder-gray-400 text-gray-800 dark:text-white"
+            className="w-full pl-14 pr-28 py-5 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 focus:border-orange-500 dark:focus:border-orange-500 focus:bg-white dark:focus:bg-gray-700 rounded-2xl text-lg transition-all duration-300 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white shadow-md focus:shadow-xl"
             aria-label="Search products"
           />
           
           {/* Search Icon */}
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl">
+          <div className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-500 text-2xl">
             🔍
           </div>
           
@@ -105,7 +105,7 @@ export default function SearchBar({
           {query && (
             <button
               onClick={clearSearch}
-              className="absolute right-20 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+              className="absolute right-24 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all duration-200"
               aria-label="Clear search"
             >
               ✕
@@ -116,7 +116,7 @@ export default function SearchBar({
           <button
             onClick={() => handleSearch()}
             disabled={loading || !query.trim()}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#FF851B] hover:bg-orange-600 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-400 text-white px-7 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 disabled:hover:scale-100 shadow-lg"
             aria-label="Search"
           >
             {loading ? '⏳' : 'Search'}
@@ -163,39 +163,41 @@ export default function SearchBar({
         
         {/* Filters */}
         {showFilters && (
-          <div className="flex flex-wrap gap-4 mt-4 justify-center items-center">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
-            {[
-              { value: 'relevance', label: 'Relevance' },
-              { value: 'price_low', label: 'Price: Low to High' },
-              { value: 'price_high', label: 'Price: High to Low' },
-              { value: 'rating', label: 'Rating' }
-            ].map((option) => (
-              <button
-                key={option.value}
-                onClick={() => handleFilterChange({ sortBy: option.value as any })}
-                className={`px-3 py-1 rounded-full text-sm transition-all duration-200 ${
-                  filters.sortBy === option.value
-                    ? 'bg-[#FF851B] text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-[#FF851B] hover:text-white'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
+          <div className="mt-4">
+            <div className="flex flex-wrap gap-2 justify-center items-center">
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mr-1">Sort by:</span>
+              {[
+                { value: 'relevance', label: 'Relevance' },
+                { value: 'price_low', label: 'Price: Low to High' },
+                { value: 'price_high', label: 'Price: High to Low' },
+                { value: 'rating', label: 'Rating' }
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => handleFilterChange({ sortBy: option.value as any })}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                    filters.sortBy === option.value
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
         {/* Quick Search Suggestions */}
-        <div className="flex flex-wrap gap-2 mt-4 justify-center">
-          <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">Popular:</span>
+        <div className="flex flex-wrap gap-2 mt-3 justify-center items-center">
+          <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mr-1">Popular:</span>
           {suggestions.slice(0, 6).map((suggestion) => (
             <button
               key={suggestion.text}
               onClick={() => handleSearch(suggestion.text)}
-              className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 hover:bg-[#FF851B] hover:text-white text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm transition-all duration-200 hover:scale-105"
+              className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gradient-to-r hover:from-orange-500 hover:to-orange-600 hover:text-white text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md"
             >
-              <span>{suggestion.icon}</span>
+              <span className="text-sm">{suggestion.icon}</span>
               <span>{suggestion.text}</span>
             </button>
           ))}

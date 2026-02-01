@@ -12,10 +12,10 @@ export default function Card({
   padding = 'md'
 }: CardProps) {
   const variantClasses = {
-    default: 'bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700',
-    elevated: 'bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-200 border border-gray-100 dark:border-gray-700',
-    outlined: 'bg-transparent rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-[#FF851B] transition-colors duration-200',
-    interactive: 'bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] cursor-pointer border border-gray-100 dark:border-gray-700'
+    default: 'bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700',
+    elevated: 'bg-white dark:bg-gray-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700',
+    outlined: 'bg-transparent rounded-2xl border-2 border-gray-200 dark:border-gray-600 hover:border-orange-500 dark:hover:border-orange-500 transition-all duration-300',
+    interactive: 'bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.03] cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-orange-200 dark:hover:border-orange-800'
   };
 
   const paddingClasses = {

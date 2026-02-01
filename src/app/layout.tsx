@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { VendorProvider } from "@/contexts/VendorContext";
+import { OrderProvider } from "@/contexts/OrderContext";
+import { AIAssistantProvider } from "@/contexts/AIAssistantContext";
 import Navbar from "@/components/Navbar";
 import FloatingActionButton from "@/components/FloatingActionButton";
 
@@ -29,17 +32,24 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F5F5F5] dark:bg-gray-900 transition-colors duration-300 text-gray-900 dark:text-gray-100`}
+        suppressHydrationWarning
       >
         <ThemeProvider>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-1 pt-16">
-              <div className="min-h-[calc(100vh-4rem)]">
-                {children}
-              </div>
-            </main>
-            <FloatingActionButton />
-          </div>
+          <VendorProvider>
+            <OrderProvider>
+              <AIAssistantProvider>
+                <div className="flex flex-col min-h-screen">
+                  <Navbar />
+                  <main className="flex-1 pt-16">
+                    <div className="min-h-[calc(100vh-4rem)]">
+                      {children}
+                    </div>
+                  </main>
+                  <FloatingActionButton />
+                </div>
+              </AIAssistantProvider>
+            </OrderProvider>
+          </VendorProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,6 @@
-# Multilingual Mandi - 
+# Multilingual Mandi - AI-Powered Marketplace
 
-A web platform for local vendors providing instant AI-driven price discovery and negotiation tools with English-Hindi translation.
+A web platform for local vendors providing instant AI-driven price discovery, negotiation tools, speech-to-text capabilities, and multilingual AI assistance with English-Hindi translation.
 
 ## 🚀 Quick Start
 
@@ -35,22 +35,88 @@ A web platform for local vendors providing instant AI-driven price discovery and
 
 4. **Open browser:** http://localhost:3000
 
-## 🎯 MVP Features
+## 🎯 Core Features
 
+### 🛍️ Customer Features
 1. **Bilingual Product Search** - Search in English/Hindi with auto-translation
-2. **Mock Price Discovery** - Compare prices from multiple vendors
-3. **Translation Chat** - Real-time English↔Hindi chat translation
-4. **Price Negotiation Simulator** - AI-suggested negotiation flow
+2. **AI Shopping Assistant** 🤖 - Multilingual AI chatbot with:
+   - Speech-to-text voice input
+   - Context-aware product recommendations
+   - Price negotiation guidance
+   - Quality & delivery information
+3. **Price Discovery** - Compare prices from multiple vendors
+4. **Translation Chat** - Real-time English↔Hindi chat translation with vendor
+5. **AI Negotiation Bot** - Smart price suggestions with:
+   - Market analysis-based recommendations
+   - Deal probability calculator
+   - Profit margin tracker
+6. **Voice Messaging** - Record and send voice messages
+7. **Image Sharing** - Share product images in chat
+8. **Order Management** - Track orders with 5 statuses (pending → confirmed → out-for-delivery → delivered)
+
+### 🏪 Vendor Features
+1. **Vendor Workspace** - Complete management dashboard with 15+ features
+2. **Order Processing** - Accept, manage, and fulfill customer orders
+3. **Buyer Requests** - Handle and negotiate bulk purchase requests
+4. **Customer Chat** - WhatsApp-style communication with customers
+5. **AI Negotiation Assistant** - Automated price negotiation with profit tracking
+6. **Analytics Dashboard** - Sales insights and performance metrics
+7. **Product Management** - Add, edit, delete inventory
+
+### 🤖 AI & Speech Features
+1. **Multilingual AI Agent** 🎯
+   - Understands English & Hindi
+   - Context-aware responses
+   - Smart suggestions based on conversation
+   - Price negotiation expertise
+   - Quality & delivery information
+   
+2. **Speech-to-Text** 🎤
+   - Voice input in English/Hindi
+   - Real-time transcription
+   - Confidence scoring
+   - Auto-language detection
+
+3. **AI Negotiation Engine** 💰
+   - Price suggestion algorithm (50-60% optimal range)
+   - Deal probability analysis (40-95%)
+   - Profit margin calculation
+   - Market-based recommendations
+
+## � Recent UI/UX Improvements
+
+### Dynamic Floating Action Button (Jan 2026)
+- **Smart Positioning**: Floating home/search button dynamically moves when AI Assistant opens
+- **Animation**: Smooth 500ms transition between positions
+  - Normal state: `bottom-6` (24px from bottom)
+  - AI open state: `bottom-[30rem]` (480px from bottom - drops down)
+  - AI button: `bottom-24` (96px from bottom)
+- **Global State Management**: Implemented `AIAssistantContext` using React Context API
+  - Replaces local state management across all pages
+  - Single source of truth for AI Assistant visibility
+  - Used in: Homepage, Search, Vendor Workspace, Vendor Chat
+- **Enhanced Error Handling**: Bilingual error messages (English/Hindi) with user-friendly backend connection instructions
+- **Fixed Overlapping Issues**: Resolved AI Assistant button overlapping with floating action buttons
+
+### Technical Implementation
+- Created `src/contexts/AIAssistantContext.tsx` for global AI state
+- Updated `FloatingActionButton.tsx` with dynamic positioning based on `isAIOpen` state
+- Migrated all pages to use `useAIAssistant()` hook
+- Added smooth CSS transitions with `transition-all duration-500`
+- Enhanced search error handling with backend status detection
 
 ## 🎬 Demo Flow
 
 1. **Landing Page** → Select "I'm a Buyer"
 2. **Search** → Type "टमाटर" or "tomato"
-3. **Price Comparison** → View vendor prices (₹20-35/kg)
-4. **Vendor Selection** → Click preferred vendor
-5. **Translation Chat** → Send "What's your best price?"
-6. **Negotiation** → Use AI suggestions for counter-offers
-7. **Deal Summary** → Complete transaction
+3. **AI Assistant** → Click 🤖 button for AI help (floating button automatically drops down)
+4. **Price Comparison** → View vendor prices (₹20-35/kg)
+5. **Vendor Chat** → Negotiate with AI assistance
+6. **Voice Input** → Use 🎤 button for voice messages
+7. **Place Order** → Complete purchase
+8. **Translation Chat** → Send "What's your best price?"
+9. **Negotiation** → Use AI suggestions for counter-offers
+10. **Deal Summary** → Complete transaction
 
 ## 🛠 Tech Stack
 
@@ -145,10 +211,19 @@ killall node              # Mac/Linux
 - Verify no CORS errors in browser console
 - Try refreshing the page
 
-**Search not working:**
-- Use quick suggestion buttons
-- Check backend console for errors
+**Search not working / "Failed to fetch" error:**
+- Ensure backend server is running on port 5000
+- Check terminal for backend errors
+- Recent fix: Removed duplicate `chatHistory` declaration in `server.js`
+- Use correct path: `cd multilingual-mandi/backend; npm run dev`
 - Verify mock data is loaded
+- Check browser console for specific error messages
+
+**Backend server won't start:**
+- Check for syntax errors in `server.js`
+- Ensure you're in the correct directory (`multilingual-mandi/backend`)
+- Run `npm install` in backend directory if dependencies are missing
+- Check if port 5000 is already in use
 
 Ready for demo! 🎉
 

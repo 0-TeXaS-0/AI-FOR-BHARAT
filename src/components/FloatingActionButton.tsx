@@ -2,12 +2,14 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 export default function FloatingActionButton() {
   const router = useRouter();
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { isAIOpen } = useAIAssistant();
 
   // Hide/show based on scroll direction
   useEffect(() => {
@@ -55,7 +57,7 @@ export default function FloatingActionButton() {
   return (
     <button
       onClick={action}
-      className={`fixed bottom-6 right-6 w-14 h-14 bg-[#2ECC40] hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50 flex items-center justify-center text-2xl group ${
+      className={`fixed ${isAIOpen ? 'bottom-[30rem]' : 'bottom-6'} right-6 w-14 h-14 bg-[#2ECC40] hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-110 z-50 flex items-center justify-center text-2xl group ${
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'
       }`}
       title={title}

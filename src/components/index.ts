@@ -18,5 +18,8 @@ export { default as EmptyState } from './EmptyState';
 export { default as TranslationIndicator } from './TranslationIndicator';
 export { default as TranslationToggle } from './TranslationToggle';
 
+// AI Components
+export { default as AIAssistant } from './AIAssistant';
+
 // Context
 export { ThemeProvider, useTheme } from '../contexts/ThemeContext';

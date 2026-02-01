@@ -18,11 +18,11 @@ export default function Button({
   type = 'button'
 }: ButtonProps) {
   const variantClasses = {
-    primary: 'bg-[#FF851B] hover:bg-orange-600 text-white shadow-md hover:shadow-lg',
-    secondary: 'bg-[#001f3f] hover:bg-blue-800 text-white shadow-md hover:shadow-lg',
-    accent: 'bg-[#2ECC40] hover:bg-green-600 text-white shadow-md hover:shadow-lg',
-    outline: 'border-2 border-[#FF851B] text-[#FF851B] hover:bg-[#FF851B] hover:text-white',
-    ghost: 'text-[#FF851B] hover:bg-[#FF851B]/10'
+    primary: 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl',
+    secondary: 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl',
+    accent: 'bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl',
+    outline: 'border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white',
+    ghost: 'text-orange-600 hover:bg-orange-100 dark:hover:bg-orange-900/20'
   };
 
   const sizeClasses = {
@@ -45,8 +45,8 @@ export default function Button({
         ${variantClasses[variant]}
         ${sizeClasses[size]}
         ${disabledClasses}
-        font-semibold rounded-xl transition-all duration-200
-        focus:outline-none focus:ring-2 focus:ring-[#FF851B] focus:ring-offset-2
+        font-bold rounded-xl transition-all duration-300
+        focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
         ${className}
       `}
     >

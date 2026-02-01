@@ -146,3 +146,20 @@ test-data/
 local.config.js
 local.env
 .env.local.override
+
+# AI Assistant and context files (development)
+*.context.tmp
+ai-chat-history/
+
+# Recent development artifacts
+*.duplicate.js
+*.old.tsx
+*.backup.tsx
+
+# Terminal and shell history
+.history/
+.terminal_history
+
+# VS Code workspace files
+*.code-workspace
+.vscode/extensions.json

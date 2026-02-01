@@ -58,28 +58,16 @@ class TranslationService {
       }
       
       if (result.success) {
-        // Cache the result
-        this.cache[cacheKey] = result.data;
-        return result.data;
-      } else {
-        throw new Error(result.error?.message || 'Translation service error');
+        const translated = result.data?.translatedText || text;
+        this.cache[cacheKey] = translated;
+        return translated;
       }
+      
+      throw new Error('Translation service returned no result');
     } catch (error) {
-      console.error('Translation error:', error);
-      
-      // Fallback: return original text with low confidence
-      const fallbackResponse: TranslationResponse = {
-        originalText: text,
-        translatedText: text,
-        originalLanguage: from || 'unknown',
-        targetLanguage: to || 'unknown',
-        confidence: 0.1,
-        translationMethod: 'error_fallback',
-        suggestions: ['Check internet connection', 'Try again later'],
-        timestamp: new Date().toISOString()
-      };
-      
-      return fallbackResponse;
+      console.log('Translation API unavailable, using original text');
+      // Return original text if translation fails
+      return text;
     }
   }
   
